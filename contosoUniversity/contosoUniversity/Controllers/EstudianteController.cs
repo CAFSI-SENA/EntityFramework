@@ -84,17 +84,58 @@ namespace contosoUniversity.Controllers
         // POST: Estudiante/Edit/5
         // Para protegerse de ataques de publicación excesiva, habilite las propiedades específicas a las que quiere enlazarse. Para obtener 
         // más detalles, vea https://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public ActionResult Edit([Bind(Include = "ID,PrimerNombre,PrimerApellido,FechaInscripcion")] Estudiante estudiante)
+        //{
+        //    if (ModelState.IsValid)
+        //    {
+        //        db.Entry(estudiante).State = EntityState.Modified;
+        //        db.SaveChanges();
+        //        return RedirectToAction("Index");
+        //    }
+        //    return View(estudiante);
+        //}
+
+        //// GET: Estudiante/Delete/5
+        //public ActionResult Delete(int? id)
+        //{
+        //    if (id == null)
+        //    {
+        //        return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+        //    }
+        //    Estudiante estudiante = db.Estudiantes.Find(id);
+        //    if (estudiante == null)
+        //    {
+        //        return HttpNotFound();
+        //    }
+        //    return View(estudiante);
+        //}
+        [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "ID,PrimerNombre,PrimerApellido,FechaInscripcion")] Estudiante estudiante)
+        public ActionResult EditPost(int? id)
         {
-            if (ModelState.IsValid)
+            if (id == null)
             {
-                db.Entry(estudiante).State = EntityState.Modified;
-                db.SaveChanges();
-                return RedirectToAction("Index");
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            return View(estudiante);
+            var actualizarEstudiante = db.Estudiantes.Find(id);
+            if (TryUpdateModel(actualizarEstudiante, "",
+               new string[] { "PrimerNombre", "PrimerApellido", "FechaInscripcion" }))
+            {
+                try
+                {
+                    db.SaveChanges();
+
+                    return RedirectToAction("Index");
+                }
+                catch (DataException /* dex */)
+                {
+                    //Registre el error (quite el comentario del nombre de la variable dex y agregue una línea aquí para escribir un registro.
+                    ModelState.AddModelError("", "No se pueden guardar los cambios. Vuelva a intentarlo y, si el problema persiste, consulte con el administrador del sistema.");
+                }
+            }
+            return View(actualizarEstudiante);
         }
 
         // GET: Estudiante/Delete/5
