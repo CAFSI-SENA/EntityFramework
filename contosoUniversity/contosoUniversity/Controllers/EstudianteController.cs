@@ -47,15 +47,22 @@ namespace contosoUniversity.Controllers
         // más detalles, vea https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "ID,PrimerNombre,PrimerApellido,FechaInscripcion")] Estudiante estudiante)
+        public ActionResult Create([Bind(Include = "PrimerNombre,PrimerApellido,FechaInscripcion")] Estudiante estudiante)
         {
-            if (ModelState.IsValid)
+            try
             {
-                db.Estudiantes.Add(estudiante);
-                db.SaveChanges();
-                return RedirectToAction("Index");
+                if (ModelState.IsValid)
+                {
+                    db.Estudiantes.Add(estudiante);
+                    db.SaveChanges();
+                    return RedirectToAction("Index");
+                }
             }
-
+            catch(DataException dex)
+            {
+                //Registre el error (quite el comentario del nombre de la variable dex y agregue una línea aquí para escribir un registro.
+                ModelState.AddModelError("","No es posible guardar los cambios, intente nuevamente, si el problema persiste contacte al administrador del sistema");
+            }
             return View(estudiante);
         }
 
